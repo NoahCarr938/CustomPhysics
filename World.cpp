@@ -75,6 +75,7 @@ void World::Draw()
 	for (auto& PObj : PhysObjects)
 	{
 		PObj.TickPhys(TargetFixedStep);
+		PObj.Draw();
 	}
 
 	OnDraw();

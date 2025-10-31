@@ -43,6 +43,7 @@ void PhysObject::Draw() const
 void PhysObject::AddForce(glm::vec2 Force)
 {
 	Forces += Force * ObjectMass;
+	//Forces += Force / ObjectMass;
 }
 
 void PhysObject::AddAccel(glm::vec2& Accel)
@@ -59,6 +60,10 @@ void PhysObject::AddVelocity(glm::vec2 Velocity)
 void PhysObject::AddImpulse(glm::vec2 Impulse)
 {
 	Forces += Impulse * ObjectMass;
+}
+
+void PhysObject::GravityActive(bool Active)
+{
 }
 
 
