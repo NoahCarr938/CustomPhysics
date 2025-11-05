@@ -11,7 +11,7 @@ public:
 	glm::vec2 Velocity;
 
 	float ObjectMass;
-	bool gravityActive;
+	bool gravityIsActive;
 
 	// Shape variable as a member
 	Shape shapeChoice;

@@ -13,7 +13,11 @@ struct Circle
 struct AABB
 {
 	// Terry chose half extents
-	glm::vec2 HalfExtents;  // Refers to half the dimensions of a bounding box or cube along each axis.
+	float x;
+	float y;
+	float width;
+	float height;
+	//glm::vec2 HalfExtents;  // Refers to half the dimensions of a bounding box or cube along each axis.
 };
 
 enum class ShapeType : uint8_t
@@ -41,11 +45,16 @@ struct Shape
 };
 
 /* Compares two circles and returns true if they are colliding*/
-//bool CheckCircleCircleCol(const glm::vec2& PosA, const Circle& CircleA, const glm::vec2& PosB, const Circle& CircleB);;
+bool CheckCircleCircleCol(const glm::vec2& PosA, const Circle& CircleA, const glm::vec2& PosB, const Circle& CircleB);
+bool CheckAABBCol(const glm::vec2& PosA, const AABB& BoxA, const glm::vec2& PosB, const AABB& BoxB);
+bool CheckAABBCircleCol(const glm::vec2& PosA, const Circle& Circle, const glm::vec2& PosB, const AABB& Box);
 
 /* wrapper for circle-circle collision*/
 /* A version of the function that accepts two shape (that we know are circles) and calls the correct func that actually compares*/
-//bool CheckCircleCircleCol(const glm::vec2& PosA, const Shape& ShapeA, const glm::vec2& PosB, const Shape& ShapeB) 
+bool CheckCircleCircleCol(const glm::vec2& PosA, const Shape& ShapeA, const glm::vec2& PosB, const Shape& ShapeB);
+bool CheckAABBCol(const glm::vec2& PosA, const Shape& ShapeA, const glm::vec2& PosB, const Shape& ShapeB);
+bool CheckAABBCircleCol(const glm::vec2 PosA, const Shape& ShapeA, const glm::vec2 PosB, const Shape& ShapeB);
+
 //{
 //	return CheckCircleCircleCol(PosA, ShapeA.CircleData, PosB, ShapeB.CircleData);
 //}

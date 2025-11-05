@@ -21,23 +21,23 @@ void PhysObject::TickPhys(float DeltaTime)
 
 void PhysObject::Draw() const
 {
-	//switch (Shape shapeChoice)
-	//{
-	//case ShapeType::NONE:
-	//	// We will just draw shapeless colliders as a point
-	//	DrawPixel(Position.x, Position.y, RED);
-	//	break;
-	//case ShapeType::CIRCLE:
-	//	// Draw Circle
-	//	DrawCircle(Position.x, Position.y, 5.0f, RED);
-	//	break;
-	//case ShapeType::AABB:
-	//	// draw AABB
-	//	break;
-	//default:
-	//	break;
-	//}
-	DrawCircle(Position.x, Position.y, 5.0f, RED);
+	switch (shapeChoice.Type)
+	{
+	case ShapeType::NONE:
+		// We will just draw shapeless colliders as a point
+		DrawPixel(Position.x, Position.y, RED);
+		break;
+	case ShapeType::CIRCLE:
+		// Draw Circle
+		DrawCircle(Position.x, Position.y, 5.0f, RED);
+		break;
+	case ShapeType::AABB:
+		// draw AABB
+		break;
+	default:
+		break;
+	}
+	//DrawCircle(Position.x, Position.y, 5.0f, RED);
 }
 
 void PhysObject::AddForce(glm::vec2 Force)
@@ -64,6 +64,7 @@ void PhysObject::AddImpulse(glm::vec2 Impulse)
 
 void PhysObject::GravityActive(bool Active)
 {
+	gravityIsActive = Active;
 }
 
 

@@ -1,13 +1,15 @@
 #pragma once
 #include "PhysObject.h"
-#include "vector"
+#include <vector>
+#include <memory>
 
 
 class World
 {
 private:
 	// Vector of all our PhysObjects we want to tick and draw
-	std::vector<class PhysObject> PhysObjects;
+	// vector is an array in c++
+	std::vector<std::shared_ptr<class PhysObject>> PhysObjects;
 protected:
 	// Elapsed time since last fixed tick
 	float AccumulatedFixedTime;
@@ -32,6 +34,8 @@ public:
 	// For clean up and termination
 	void Exit();
 
+	void Instantiate();
+
 	// Signals whether the world needs to shut down
 
 	// Return true if needs shutdown, otherwise false
@@ -45,9 +49,9 @@ protected:
 	virtual void OnInit() 
 	{
 		// Construct a PhysObject outside
-		PhysObject NewObject;
+		/*PhysObject NewObject;
 		NewObject.Position = { 300, 300 };
-		PhysObjects.push_back(NewObject);
+		PhysObjects->push_back(NewObject);*/
 	}
 	// Runs at end of Tick
 	virtual void OnTick() {}

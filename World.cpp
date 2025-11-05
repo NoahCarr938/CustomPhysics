@@ -5,6 +5,8 @@
 
 #include "raylib.h"
 #include <vector>
+#include <memory>
+#include "glm/vec2.hpp"
 
 /* the function signature for any collision detection test*/
 using CollisionFunc = bool(*)(const glm::vec2&, const Shape&, const glm::vec2&, const Shape&);
@@ -32,6 +34,9 @@ void World::Init()
 
 	SetTargetFPS(60);
 
+	// Make objects here, first half is pointer, second half is creating object
+	std::shared_ptr<PhysObject> Object1 = std::make_shared<PhysObject>();
+
 	// Insert Map Key here
 
 	OnInit();
@@ -49,17 +54,10 @@ void World::Tick()
 
 void World::TickFixed()
 {
-	// Apply the gravity in here
-
 	AccumulatedFixedTime -= TargetFixedStep;
-
 	//std::cout << "Fixed Tick!!" << std::endl;
 	// call our lifecycle function
 	// todo the actual physics update
-
-	
-
-
 	OnTickFixed();
 }
 
@@ -72,10 +70,15 @@ void World::Draw()
 	DrawText("Congrats!", 190, 200, 20, LIGHTGRAY);
 
 	// Drawing all objects to screen
-	for (auto& PObj : PhysObjects)
+	for (auto PObj : PhysObjects)
 	{
-		PObj.TickPhys(TargetFixedStep);
-		PObj.Draw();
+		PObj->TickPhys(TargetFixedStep);
+		PObj->Draw();
+
+		if (UsingGravity && PObj->gravityIsActive)
+		{
+			PObj->AddAccel(glm::vec2{ 0, 5 } * GravityScale);
+		}
 	}
 
 	OnDraw();
