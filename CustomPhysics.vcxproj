@@ -136,6 +136,7 @@
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EnumUtils.h" />
     <ClInclude Include="PhysObject.h" />
     <ClInclude Include="Shapes.h" />
     <ClInclude Include="World.h" />

@@ -13,7 +13,7 @@ public:
 	float ObjectMass;
 	bool gravityIsActive;
 
-	// Shape variable as a member
+	// Shape variable as a member, kind of the collision volume
 	Shape shapeChoice;
 
 	PhysObject();
@@ -25,7 +25,8 @@ public:
 	// 2-dimensional vector param is for the direction and the length of the force applied
 	void AddForce(glm::vec2 Force);
 
-	void AddAccel(glm::vec2& Accel);
+	// Terry has a reference to vec2, vec2&
+	void AddAccel(glm::vec2 Accel);
 
 	void AddVelocity(glm::vec2 Velocity);
 

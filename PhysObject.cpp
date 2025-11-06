@@ -2,8 +2,15 @@
 #include "World.h"
 #include "raylib.h"
 
+const float TargetFixedTimestep = 1 / 30.0f;
+
 // Provide safe default values
-PhysObject::PhysObject() : Position({ 0, 0, }), Velocity({ 0, 0 }), Forces({ 0, 0 }), ObjectMass(10)
+PhysObject::PhysObject() :
+	Position({ 0, 0, }),
+	Velocity({ 0, 0 }),
+	Forces({ 0, 0 }),
+	ObjectMass(10),
+	shapeChoice({ShapeType::NONE})
 {
 }
 
@@ -29,15 +36,18 @@ void PhysObject::Draw() const
 		break;
 	case ShapeType::CIRCLE:
 		// Draw Circle
-		DrawCircle(Position.x, Position.y, 5.0f, RED);
+		DrawCircleLines(Position.x, Position.y, shapeChoice.CircleData.Radius, RED);
 		break;
 	case ShapeType::AABB:
 		// draw AABB
+		DrawRectangleLines(Position.x - shapeChoice.AABBData.HalfExtents.x, Position.y - shapeChoice.AABBData.HalfExtents.y,
+			shapeChoice.AABBData.HalfExtents.x * 2.0f, shapeChoice.AABBData.HalfExtents.y * 2.0f,
+			BLUE);
 		break;
 	default:
 		break;
 	}
-	//DrawCircle(Position.x, Position.y, 5.0f, RED);
+	
 }
 
 void PhysObject::AddForce(glm::vec2 Force)
@@ -46,9 +56,10 @@ void PhysObject::AddForce(glm::vec2 Force)
 	//Forces += Force / ObjectMass;
 }
 
-void PhysObject::AddAccel(glm::vec2& Accel)
+void PhysObject::AddAccel(glm::vec2 Accel)
 {
-	Forces += Accel;
+	//Forces += Accel;
+	Velocity += Accel * TargetFixedTimestep;
 }
 
 void PhysObject::AddVelocity(glm::vec2 Velocity)
