@@ -4,3 +4,5 @@ You can spawn objects by clicking both the left and right mouse buttons.
 Circle-Circle, AABB-AABB, and Circle-AABB Collision.
 Download the zipped file and extract all from the file.
 Double click the exe file to run the simulation!
+
+BUGS: The Circle-AABB Collision is very buggy right now and will launch the objects.
