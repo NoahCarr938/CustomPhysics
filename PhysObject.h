@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/vec2.hpp>
+#include <glm/geometric.hpp>
 #include "Shapes.h"
 
 class PhysObject
@@ -34,5 +35,12 @@ public:
 
 	void GravityActive(bool Active);
 
+	/* Calculates an impulse to object A and B, sdduming they are in collision*/
+	float ResolveCollision(const glm::vec2& PosA, const glm::vec2& VelA, float MassA,
+		const glm::vec2& PosB, const glm::vec2& VelB, float MassB,
+		float Elasticity, const glm::vec2& Normal);
+
+	/* Resolves a collision between two PhysObject instances*/
+	void ResolvePhysObjects(PhysObject& Lhs, PhysObject& Rhs, float Elasticity, const glm::vec2& Normal, float Pen);
 	
 };

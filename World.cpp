@@ -14,8 +14,14 @@
 using CollisionFunc = bool(*)(const glm::vec2&, const Shape&, const glm::vec2&, const Shape&);
 /* a map that takes a collision pair and returns the correct function to call*/
 using CollisionMap = std::unordered_map<ShapeType, CollisionFunc>;
+/* function signature for resolution functions*/
+using DepenetrationFunc = glm::vec2(*)(const glm::vec2& PosA, const Shape& ShapeA, const glm::vec2& PosB, const Shape& ShapeB, float& Pen);
+/* map for associating pairs of collision shapes with their resolution functions*/
+using DepenetrationMap = std::unordered_map<ShapeType, DepenetrationFunc>;
 
 CollisionMap ColMap;
+/* stores functions for resolving collisions between any two types*/
+DepenetrationMap DepenMap;
 
 // Providing safe defaults at 30 fps
 World::World() : AccumulatedFixedTime(0), TargetFixedStep(1.0f / 30.0f), GravityScale(1.0f), UsingGravity(true)
@@ -35,6 +41,13 @@ void World::Init()
 	ColMap[ShapeType::CIRCLE | ShapeType::CIRCLE] = CheckCircleCircleCol;
 	ColMap[ShapeType::AABB | ShapeType::AABB] = CheckAABBCol;
 	ColMap[ShapeType::CIRCLE | ShapeType::AABB] = CheckCircleAABBCol;
+
+	/* register the handler for Circle-Circle resolutions*/
+	DepenMap[ShapeType::CIRCLE | ShapeType::CIRCLE] = DepenetrateCircleCircle;
+	/* register the handler for AABB resolutions*/
+	DepenMap[ShapeType::AABB | ShapeType::AABB] = DepenetrateAABB;
+	/* register the handler for Circle-AABB resolutions*/
+	DepenMap[ShapeType::CIRCLE | ShapeType::AABB] = DepenetrateCircleAABB;
 
 	OnInit();
 }
@@ -83,6 +96,7 @@ void World::TickFixed()
 
 			if (bHasFunc)
 			{
+				/* 'i' stands for Lhs, 'j' stands for Rhs*/
 				bool bIsColliding = false;
 				/* re-arrange our params if they are out of order*/
 				if (i.shapeChoice.Type > j.shapeChoice.Type)
@@ -93,8 +107,23 @@ void World::TickFixed()
 				{
 					bIsColliding = ColMap[ColKey](i.Position, i.shapeChoice, j.Position, j.shapeChoice);
 				}
+
+				ShapeType PairType = i.shapeChoice.Type | j.shapeChoice.Type;
+
 				if (bIsColliding)
 				{
+					/* Pen will be assigned a value by the depenetration func belowm but it's good to have a default nonetheless*/
+					float Pen = 0.0f;
+					glm::vec2 Normal = DepenMap[PairType](i.Position, i.shapeChoice,
+						j.Position, j.shapeChoice, Pen);
+
+
+					i.ResolvePhysObjects(
+						i,  // first object
+						j,   // second object
+						1.0f,   // elasticity - hard coded to 1 for now (could be configurable in World)
+						Normal, // collision normal
+						Pen);   // penetration depth
 					std::cout << "It is colliding" << std::endl;
 				}
 			}
@@ -120,7 +149,7 @@ void World::Draw()
 	DrawText("Congrats!", 190, 200, 20, LIGHTGRAY);
 
 	// Drawing all objects to screen
-	for (auto PObj : PhysObjects)
+	for (auto& const PObj : PhysObjects)
 	{
 		PObj.Draw();
 	}

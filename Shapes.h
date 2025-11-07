@@ -71,3 +71,22 @@ bool CheckCircleCircleCol(const glm::vec2& PosA, const Shape& ShapeA, const glm:
 bool CheckAABBCol(const glm::vec2& PosA, const Shape& ShapeA, const glm::vec2& PosB, const Shape& ShapeB);
 /* wrapper for circle-AABB collision*/
 bool CheckCircleAABBCol(const glm::vec2& PosA, const Shape& ShapeA, const glm::vec2& PosB, const Shape& ShapeB);
+
+/* returns minimum translation direction (MTD)*/
+/* penetration depth written to 'pen'*/
+glm::vec2 DepenetrateCircleCircle(const glm::vec2& PosA, const Circle& CircleA, const glm::vec2& PosB, const Circle& CircleB, float& Pen);
+
+/* Wrapper for compatibility with Shapes, returns MTD, penetration depth written to 'pen'*/
+glm::vec2 DepenetrateCircleCircle(const glm::vec2& PosA, const Shape& ShapeA, const glm::vec2& PosB, const Shape& ShapeB, float& Pen);
+
+
+glm::vec2 DepenetrateAABB(const glm::vec2& PosA, const AABB& AABBA, const glm::vec2& PosB, const AABB& AABBB, float& Pen);
+
+/* Wrapper for compatibility with Shapes*/
+glm::vec2 DepenetrateAABB(const glm::vec2& PosA, const Shape& ShapeA, const glm::vec2& PosB, const Shape& ShapeB, float& Pen);
+
+
+glm::vec2 DepenetrateCircleAABB(const glm::vec2& PosA, const Circle& Circle, const glm::vec2& PosB, const AABB& AABB, float& Pen);
+
+/* Wrapper for compatibility with Shapes*/
+glm::vec2 DepenetrateCircleAABB(const glm::vec2& PosA, const Shape& ShapeA, const glm::vec2& PosB, const Shape& ShapeB, float& Pen);
