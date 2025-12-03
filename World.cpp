@@ -24,7 +24,7 @@ CollisionMap ColMap;
 DepenetrationMap DepenMap;
 
 // Providing safe defaults at 30 fps
-World::World() : AccumulatedFixedTime(0), TargetFixedStep(1.0f / 30.0f), GravityScale(1.0f), UsingGravity(true)
+World::World() : AccumulatedFixedTime(0), TargetFixedStep(1.0f / 30.0f), GravityScale(2.0f), UsingGravity(true)
 {
 }
 

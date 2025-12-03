@@ -117,35 +117,67 @@ glm::vec2 DepenetrateAABB(const glm::vec2& PosA, const Shape& ShapeA, const glm:
 glm::vec2 DepenetrateCircleAABB(const glm::vec2& PosA, const Circle& Circle, const glm::vec2& PosB, const AABB& AABB, float& Pen)
 {
 	glm::vec2 depen;
-	depen = PosA;
 
-	
+	// Calculating AABB bounds
+	glm::vec2 minB = PosB - AABB.HalfExtents;
+	glm::vec2 maxB = PosB + AABB.HalfExtents;
 
-	if (PosA.x < PosB.x + AABB.HalfExtents.x)
+	// Clamp logic to ensure objects remain within bounds
+	depen.x = glm::clamp(PosA.x, minB.x, maxB.x);
+	depen.y = glm::clamp(PosA.y, minB.y, maxB.y);
+
+	glm::vec2 Difference = PosA - depen;
+	float Distance = glm::length(Difference);
+
+	float pen = Circle.Radius - Distance;
+
+	// If the circle center is inside the AABB
+	if (Distance <= 0.0f)
+		return glm::vec2(0, 1);
+
+	// If the circle center is outside the AABB
+	if (Distance > 0.0f)
 	{
-		depen.x = PosB.x + AABB.HalfExtents.x;
+		// Normalizing the push direction
+		return (Difference / Distance) * pen;
+		//return glm::vec2(0);
 	}
-	else if (PosA.x > PosB.x + AABB.HalfExtents.x)
-	{
-		depen.x = PosB.x + AABB.HalfExtents.x;
-	}
-
-	if (PosA.y < PosB.y + AABB.HalfExtents.y)
-	{
-		depen.y = PosB.y + AABB.HalfExtents.y;
-	}
-	else if (PosA.y > PosB.y + AABB.HalfExtents.y)
-	{
-		depen.y = PosB.y + AABB.HalfExtents.y;
-	}
-
-	glm::vec2 Dist = PosA - depen;
-	float Distance = glm::sqrt((Dist.x * Dist.x) + (Dist.y * Dist.y));
-
-	Pen = Circle.Radius - Distance;
-
-	return glm::normalize(depen - PosA);
 }
+
+//glm::vec2 DepenetrateCircleAABB(const glm::vec2& PosA, const Circle& Circle, const glm::vec2& PosB, const AABB& AABB, float& Pen)
+//{
+//	glm::vec2 depen;
+//	depen = PosA;
+//
+//	// Calculating AABB bounds
+//	glm::vec2 minB = PosB - AABB.HalfExtents.x;
+//	glm::vec2 maxB = PosB + AABB.HalfExtents.x;
+//
+//	if (PosA.x < PosB.x + AABB.HalfExtents.x)
+//	{
+//		depen.x = PosB.x + AABB.HalfExtents.x;
+//	}
+//	else if (PosA.x > PosB.x + AABB.HalfExtents.x)
+//	{
+//		depen.x = PosB.x + AABB.HalfExtents.x;
+//	}
+//
+//	if (PosA.y < PosB.y + AABB.HalfExtents.y)
+//	{
+//		depen.y = PosB.y + AABB.HalfExtents.y;
+//	}
+//	else if (PosA.y > PosB.y + AABB.HalfExtents.y)
+//	{
+//		depen.y = PosB.y + AABB.HalfExtents.y;
+//	}
+//
+//	glm::vec2 Dist = PosA - depen;
+//	float Distance = glm::sqrt((Dist.x * Dist.x) + (Dist.y * Dist.y));
+//
+//	Pen = Circle.Radius - Distance;
+//
+//	return glm::normalize(depen - PosA);
+//}
 
 glm::vec2 DepenetrateCircleAABB(const glm::vec2& PosA, const Shape& ShapeA, const glm::vec2& PosB, const Shape& ShapeB, float& Pen)
 {
