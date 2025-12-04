@@ -1,6 +1,7 @@
 #include "PhysObject.h"
 #include "World.h"
 #include "raylib.h"
+#include <iostream>
 
 const float TargetFixedTimestep = 1 / 30.0f;
 
@@ -23,7 +24,16 @@ void PhysObject::TickPhys(float DeltaTime)
 	Forces = {};
 
 	// Integrate velocity into position
+	glm::vec2 previousPosition = Position;
 	Position += Velocity * DeltaTime;
+
+	if (isnan(Position.x) || isnan(Position.y))
+	{
+		Position = previousPosition;
+		float newVelocityX = GetRandomValue(-10, 10);
+		float newVelocityY = GetRandomValue(-10, 10);
+		Velocity = glm::vec2(newVelocityX, newVelocityY);
+	}
 }
 
 void PhysObject::Draw() const
@@ -82,6 +92,7 @@ float PhysObject::ResolveCollision(const glm::vec2& PosA, const glm::vec2& VelA,
 {
 	/* calculate the relative velocity*/
 	glm::vec2 RelVel = VelB - VelA;
+	//glm::vec2 RelVel = VelA - VelB;
 
 	/* Calculate the impulse magnitude*/
 	float ImpulseMag = glm::dot(-(1.0f + Elasticity) * RelVel, Normal) /
@@ -99,15 +110,22 @@ void PhysObject::ResolvePhysObjects(PhysObject& Lhs, PhysObject& Rhs, float Elas
 
 	/* depenetrate objects*/
 	glm::vec2 Mtv = Normal * Pen;
+	// If penetration is too far in, it no go bonkers
+	if (Lhs.Position == Rhs.Position || isnan(Mtv.x) || isnan(Mtv.y))
+	{
+		float newMtvX = GetRandomValue(-10, 10);
+		float newMtvY = GetRandomValue(-10, 10);
+		Mtv = glm::vec2(newMtvX, newMtvY);
+	}
 	Lhs.Position -= Mtv;
 	Rhs.Position += Mtv;
-
-	/* TODO: do not bother applying impulses to static/kinematic objects*/
 
 	/* apply impulses to update velocity after collision*/
 	glm::vec2 Impulse = Normal * ImpulseMag;
 	Lhs.AddImpulse(-Impulse);
 	Rhs.AddImpulse(Impulse);
+
+	/*std::cout << "Mtv X: " << Mtv.x << "\Mtv Y: " << Mtv.y << std::endl;*/
 }
 
 

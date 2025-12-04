@@ -1,5 +1,6 @@
 #include "Shapes.h"
 #include "glm/glm.hpp"
+#include <iostream>
 
 //mtv is minimum translation vector
 
@@ -36,7 +37,7 @@ bool CheckCircleAABBCol(const glm::vec2& PosA, const Circle& Circle, const glm::
 	float distX = PosA.x - glm::clamp(PosA.x, PosB.x - AABBB.HalfExtents.x, PosB.x + AABBB.HalfExtents.x);
 	float distY = PosA.y - glm::clamp(PosA.y, PosB.y - AABBB.HalfExtents.y, PosB.y + AABBB.HalfExtents.y);
 	/* consider it in collision if the distance to that point is less than the circle's radius*/
-	return (distX * distX) + (distY * distY);
+	return (distX * distX) + (distY * distY) < Circle.Radius * Circle.Radius;
 }
 
 bool CheckCircleCircleCol(const glm::vec2& PosA, const Shape& ShapeA, const glm::vec2& PosB, const Shape& ShapeB)
@@ -114,70 +115,51 @@ glm::vec2 DepenetrateAABB(const glm::vec2& PosA, const Shape& ShapeA, const glm:
 	return DepenetrateAABB(PosA, ShapeA.AABBData, PosB, ShapeB.AABBData, Pen);
 }
 
-glm::vec2 DepenetrateCircleAABB(const glm::vec2& PosA, const Circle& Circle, const glm::vec2& PosB, const AABB& AABB, float& Pen)
+glm::vec2 DepenetrateCircleAABB(const glm::vec2& PosA, const Circle& Circle, const glm::vec2& PosB, const AABB& AABB, float& pen)
 {
 	glm::vec2 depen;
+	// Assigning default penetration values
+	float penX = 10;
+	float penY = 10;
+	float penXA = 10;
+	float penXB = 10;
+	float penYA = 10;
+	float penYB = 10;
 
-	// Calculating AABB bounds
-	glm::vec2 minB = PosB - AABB.HalfExtents;
-	glm::vec2 maxB = PosB + AABB.HalfExtents;
-
-	// Clamp logic to ensure objects remain within bounds
-	depen.x = glm::clamp(PosA.x, minB.x, maxB.x);
-	depen.y = glm::clamp(PosA.y, minB.y, maxB.y);
+	// Getting the closest point 
+	float closestPointX = glm::clamp(PosA.x, PosB.x - (AABB.HalfExtents.x), PosB.x + (AABB.HalfExtents.x));
+	float closestPointY = glm::clamp(PosA.y, PosB.y - (AABB.HalfExtents.y), PosB.y + (AABB.HalfExtents.y));
+	glm::vec2 closestPos = glm::vec2(closestPointX, closestPointY);
 
 	glm::vec2 Difference = PosA - depen;
 	float Distance = glm::length(Difference);
 
-	float pen = Circle.Radius - Distance;
+	penX = PosA.x + Circle.Radius - closestPos.x;
+	penY = PosA.y - Circle.Radius - closestPos.y;
+	pen = fminf(glm::abs(penX), glm::abs(penY));
+
+	penYA = (PosA.y + Circle.Radius) - closestPos.y;
+	penYB = (PosA.y - Circle.Radius) - closestPos.y;
+	penXA = (PosA.x + Circle.Radius) - closestPos.x;
+	penXB = (PosA.x - Circle.Radius) - closestPos.x;
+	penX = fminf(glm::abs(penXA), glm::abs(penXB));
+	penY = fminf(glm::abs(penYA), glm::abs(penYB));
+
+	pen = fminf(glm::abs(penX), glm::abs(penY));
+	/*std::cout << " Penetration: " << pen << std::endl;*/
 
 	// If the circle center is inside the AABB
-	if (Distance <= 0.0f)
+	if (Distance <= 1.0f)
 		return glm::vec2(0, 1);
 
 	// If the circle center is outside the AABB
-	if (Distance > 0.0f)
+	if (Distance > 1.0f)
 	{
 		// Normalizing the push direction
-		return (Difference / Distance) * pen;
-		//return glm::vec2(0);
+		return glm::normalize(closestPos - PosA);
 	}
 }
 
-//glm::vec2 DepenetrateCircleAABB(const glm::vec2& PosA, const Circle& Circle, const glm::vec2& PosB, const AABB& AABB, float& Pen)
-//{
-//	glm::vec2 depen;
-//	depen = PosA;
-//
-//	// Calculating AABB bounds
-//	glm::vec2 minB = PosB - AABB.HalfExtents.x;
-//	glm::vec2 maxB = PosB + AABB.HalfExtents.x;
-//
-//	if (PosA.x < PosB.x + AABB.HalfExtents.x)
-//	{
-//		depen.x = PosB.x + AABB.HalfExtents.x;
-//	}
-//	else if (PosA.x > PosB.x + AABB.HalfExtents.x)
-//	{
-//		depen.x = PosB.x + AABB.HalfExtents.x;
-//	}
-//
-//	if (PosA.y < PosB.y + AABB.HalfExtents.y)
-//	{
-//		depen.y = PosB.y + AABB.HalfExtents.y;
-//	}
-//	else if (PosA.y > PosB.y + AABB.HalfExtents.y)
-//	{
-//		depen.y = PosB.y + AABB.HalfExtents.y;
-//	}
-//
-//	glm::vec2 Dist = PosA - depen;
-//	float Distance = glm::sqrt((Dist.x * Dist.x) + (Dist.y * Dist.y));
-//
-//	Pen = Circle.Radius - Distance;
-//
-//	return glm::normalize(depen - PosA);
-//}
 
 glm::vec2 DepenetrateCircleAABB(const glm::vec2& PosA, const Shape& ShapeA, const glm::vec2& PosB, const Shape& ShapeB, float& Pen)
 {

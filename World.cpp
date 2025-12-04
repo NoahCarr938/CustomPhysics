@@ -88,6 +88,7 @@ void World::TickFixed()
 			
 
 			ShapeType ColKey = i.shapeChoice.Type | j.shapeChoice.Type;
+			ShapeType Pair = i.shapeChoice.Type | j.shapeChoice.Type;
 			auto KeyPairIt = ColMap.find(ColKey);
 
 			bool bHasFunc = KeyPairIt != ColMap.end();
@@ -124,7 +125,11 @@ void World::TickFixed()
 						1.0f,   // elasticity - hard coded to 1 for now (could be configurable in World)
 						Normal, // collision normal
 						Pen);   // penetration depth
-					std::cout << "It is colliding" << std::endl;
+					//std::cout << "It is colliding" << std::endl;
+					//std::cout << "box x pos " << j.Position.x << std::endl;
+					//std::cout << "box y pos " << j.Position.y << std::endl;
+
+					
 				}
 			}
 
@@ -136,7 +141,6 @@ void World::TickFixed()
 	}
 	
 	// call our lifecycle function
-	// todo the actual physics update
 	OnTickFixed();
 }
 
@@ -146,7 +150,6 @@ void World::Draw()
 
 	ClearBackground(BLACK);
 
-	DrawText("Congrats!", 190, 200, 20, LIGHTGRAY);
 
 	// Drawing all objects to screen
 	for (auto& const PObj : PhysObjects)
