@@ -27,6 +27,7 @@ void PhysObject::TickPhys(float DeltaTime)
 	glm::vec2 previousPosition = Position;
 	Position += Velocity * DeltaTime;
 
+	// If the position of the objects is too far away, bring it back into view
 	if (isnan(Position.x) || isnan(Position.y))
 	{
 		Position = previousPosition;
@@ -110,7 +111,7 @@ void PhysObject::ResolvePhysObjects(PhysObject& Lhs, PhysObject& Rhs, float Elas
 
 	/* depenetrate objects*/
 	glm::vec2 Mtv = Normal * Pen;
-	// If penetration is too far in, it no go bonkers
+	// If penetration is too far in, objects wont get launched super far.
 	if (Lhs.Position == Rhs.Position || isnan(Mtv.x) || isnan(Mtv.y))
 	{
 		float newMtvX = GetRandomValue(-10, 10);
