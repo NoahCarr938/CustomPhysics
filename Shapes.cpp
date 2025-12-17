@@ -117,8 +117,9 @@ glm::vec2 DepenetrateAABB(const glm::vec2& PosA, const Shape& ShapeA, const glm:
 
 glm::vec2 DepenetrateCircleAABB(const glm::vec2& PosA, const Circle& Circle, const glm::vec2& PosB, const AABB& AABB, float& pen)
 {
+	// a depenetration vector between a circle center and the closest AABB point.
 	glm::vec2 depen;
-	// Assigning default penetration values
+	// Assigning default penetration values just to be safe
 	float penX = 10;
 	float penY = 10;
 	float penXA = 10;
@@ -127,6 +128,8 @@ glm::vec2 DepenetrateCircleAABB(const glm::vec2& PosA, const Circle& Circle, con
 	float penYB = 10;
 
 	// Getting the closest point 
+	// Pos a is the circle center, pos b is the aabb center
+	// clamping the circle's position to the AABB corners
 	float closestPointX = glm::clamp(PosA.x, PosB.x - (AABB.HalfExtents.x), PosB.x + (AABB.HalfExtents.x));
 	float closestPointY = glm::clamp(PosA.y, PosB.y - (AABB.HalfExtents.y), PosB.y + (AABB.HalfExtents.y));
 	glm::vec2 closestPos = glm::vec2(closestPointX, closestPointY);
@@ -136,15 +139,20 @@ glm::vec2 DepenetrateCircleAABB(const glm::vec2& PosA, const Circle& Circle, con
 
 	penX = PosA.x + Circle.Radius - closestPos.x;
 	penY = PosA.y - Circle.Radius - closestPos.y;
+	// output penetration depth
 	pen = fminf(glm::abs(penX), glm::abs(penY));
 
+	// y-axis penetration
 	penYA = (PosA.y + Circle.Radius) - closestPos.y;
 	penYB = (PosA.y - Circle.Radius) - closestPos.y;
+	// x-axis penetration
 	penXA = (PosA.x + Circle.Radius) - closestPos.x;
 	penXB = (PosA.x - Circle.Radius) - closestPos.x;
+	// The smallest penetration on each axis
 	penX = fminf(glm::abs(penXA), glm::abs(penXB));
 	penY = fminf(glm::abs(penYA), glm::abs(penYB));
 
+	// output penetration depth
 	pen = fminf(glm::abs(penX), glm::abs(penY));
 	/*std::cout << " Penetration: " << pen << std::endl;*/
 
@@ -155,7 +163,7 @@ glm::vec2 DepenetrateCircleAABB(const glm::vec2& PosA, const Circle& Circle, con
 	// If the circle center is outside the AABB
 	if (Distance > 1.0f)
 	{
-		// Normalizing the push direction
+		// Normalizing the push direction, pushing the circle away from the AABB shape
 		return glm::normalize(closestPos - PosA);
 	}
 }
